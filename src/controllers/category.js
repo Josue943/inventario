@@ -2,15 +2,21 @@ const router = require('express').Router();
 const { Op } = require('sequelize');
 
 const Category = require('../models/category');
+const getPagination = require('../utils/getPagination');
+const getPaginatedResponse = require('../utils/getPaginatedResponse');
 const setSearch = require('../utils/setSearch');
 
 //sortBy  order
 router.get('', async (req, res) => {
   const where = {};
-  if (req.query.search) where[Op.or] = setSearch(['name'], req.query.search);
-  const categories = await Category.findAll({ where });
 
-  res.send(categories);
+  if (req.query.search) where[Op.or] = setSearch(['name'], req.query.search);
+
+  const pagination = getPagination(req.query.limit, req.query.page);
+
+  const categories = await Category.findAndCountAll({ where, ...pagination });
+
+  res.send(getPaginatedResponse(categories, pagination.limit));
 });
 
 router.post('', async (req, res) => {

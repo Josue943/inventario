@@ -1,15 +1,25 @@
 const router = require('express').Router();
 const { Op } = require('sequelize');
 
+const getPagination = require('../utils/getPagination');
+const getPaginatedResponse = require('../utils/getPaginatedResponse');
+const Person = require('../models/person');
 const Supplier = require('../models/supplier');
 const setSearch = require('../utils/setSearch');
 
 router.get('', async (req, res) => {
   const where = {};
-  if (req.query.search) where[Op.or] = setSearch(['name', 'phone'], req.query.search);
+  if (req.query.search) where[Op.or] = setSearch(['name', 'phone', 'surnames'], req.query.search);
 
-  const suppliers = await Supplier.findAll({ where });
-  res.send(suppliers);
+  const pagination = getPagination(req.query.limit, req.query.page);
+
+  const suppliers = await Supplier.findAndCountAll({
+    attributes: { exclude: ['personId'] },
+    include: { model: Person, as: 'details', where },
+    ...pagination,
+  });
+
+  res.send(getPaginatedResponse(suppliers, pagination.limit));
 });
 
 router.post('', async (req, res) => {

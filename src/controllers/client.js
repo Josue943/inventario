@@ -2,12 +2,18 @@ const router = require('express').Router();
 const { Op } = require('sequelize');
 
 const Client = require('../models/client');
+const Person = require('../models/person');
 const setSearch = require('../utils/setSearch');
 
 router.get('', async (req, res) => {
   const where = {};
-  if (req.query.search) where[Op.or] = setSearch(['names'], req.query.search);
-  const clients = await Client.findAll({ where });
+  if (req.query.search) where[Op.or] = setSearch(['name'], req.query.search);
+
+  const clients = await Client.findAll({
+    attributes: { exclude: ['personId'] },
+    include: { model: Person, as: 'details', where },
+  });
+
   res.send(clients);
 });
 

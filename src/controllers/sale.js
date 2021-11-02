@@ -6,6 +6,10 @@ const Product = require('../models/product');
 const Sale = require('../models/sale');
 const SaleProduct = require('../models/saleProduct');
 
+/*
+•	Ver lista de ventas pendientes.
+
+*/
 //dd/mm/year
 router.get('', async (req, res) => {
   const where = {};

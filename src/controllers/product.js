@@ -1,23 +1,28 @@
+const { Op, Sequelize } = require('sequelize');
 const router = require('express').Router();
-const { Op } = require('sequelize');
 
-const sequelize = require('../db');
+const getPagination = require('../utils/getPagination');
+const getPaginatedResponse = require('../utils/getPaginatedResponse');
 const Product = require('../models/product');
 const setSearch = require('../utils/setSearch');
 
 router.get('', async (req, res) => {
-  const helper = { order: [], where: {} };
+  const helper = { order: [['id', 'ASC']], where: {} };
 
   if (req.query.category) helper.where.categoryId = req.query.category;
 
-  if (req.query.stock) helper.where.stock = { [Op.lte]: sequelize.col('minStock') };
+  if (req.query.stock) helper.where.stock = { [Op.lte]: Sequelize.col('minStock') };
 
-  if (req.query.search) helper.where[Op.or] = setSearch(['id', 'name'], req.query.search);
+  if (req.query.search) helper.where[Op.or] = setSearch(['barCode', 'name'], req.query.search);
 
-  if (req.query.sortBy) helper.order.push([req.query.sortBy, req.query.order || 'ASC']);
+  if (req.query.expiration) helper.where.expiration = { [Op.ne]: null };
 
-  const products = await Product.findAll(helper);
-  res.send(products);
+  if (req.query.sortBy) helper.order.unshift([req.query.sortBy, req.query.order || 'ASC']);
+
+  const pagination = getPagination(req.query.limit, req.query.page);
+
+  const products = await Product.findAndCountAll({ ...helper, ...pagination });
+  res.send(getPaginatedResponse(products, req.query.limit));
 });
 
 router.post('', async (req, res) => {
@@ -28,7 +33,7 @@ router.post('', async (req, res) => {
 router.patch('/:id', async (req, res) => {
   const product = await Product.update(req.body, { where: { id: req.params.id } });
   if (!product[0]) return res.status(404).send();
-  res.send(product);
+  res.send();
 });
 
 router.delete('/:id', async (req, res) => {

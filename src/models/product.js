@@ -1,32 +1,21 @@
 const { DataTypes, Model } = require('sequelize');
 
+const Category = require('./category');
+const Supplier = require('./supplier');
 const sequelize = require('../db');
 
 class Product extends Model {}
 
 Product.init(
   {
-    id: {
+    barCode: {
       type: DataTypes.STRING,
-      primaryKey: true,
-      unique: true,
       allowNull: false,
+      unique: true,
     },
     name: {
       type: DataTypes.STRING,
       allowNull: false,
-    },
-    costPrice: {
-      type: DataTypes.FLOAT,
-      defaultValue: 0,
-    },
-    salePrice: {
-      type: DataTypes.FLOAT,
-      defaultValue: 0,
-    },
-    wholesalePrice: {
-      type: DataTypes.FLOAT,
-      defaultValue: 0,
     },
     stock: {
       type: DataTypes.INTEGER,
@@ -36,15 +25,36 @@ Product.init(
       type: DataTypes.INTEGER,
       defaultValue: 0,
     },
-    maxStock: {
-      type: DataTypes.INTEGER,
+    price: {
+      type: DataTypes.FLOAT,
       defaultValue: 0,
+    },
+    discount: {
+      type: DataTypes.FLOAT,
+      defaultValue: 0,
+      validate: { min: 0, max: 99 },
+    },
+    brand: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    presentation: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     sold: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
     },
-    image: {
+    warranty: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    enabled: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
+    expiration: {
       type: DataTypes.STRING,
       allowNull: true,
     },
@@ -55,5 +65,8 @@ Product.init(
     timestamps: false,
   }
 );
+
+Product.belongsTo(Supplier, { foreignKey: { name: 'supplierId' }, onDelete: 'RESTRICT' });
+Product.belongsTo(Category, { foreignKey: { name: 'categoryId' }, onDelete: 'RESTRICT' });
 
 module.exports = Product;
