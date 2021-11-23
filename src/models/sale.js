@@ -1,6 +1,6 @@
 const { DataTypes, Model, NOW } = require('sequelize');
 
-const Client = require('./client');
+const Person = require('./person');
 const sequelize = require('../db');
 
 class Sale extends Model {}
@@ -27,6 +27,6 @@ Sale.init(
   { tableName: 'sales', sequelize, timestamps: false }
 );
 
-Sale.belongsTo(Client, { foreignKey: { name: 'clientId', allowNull: false } });
+Sale.belongsTo(Person, { as: 'client', foreignKey: { name: 'clientId', allowNull: false } });
 
 module.exports = Sale;

@@ -14,7 +14,6 @@ router.get('', async (req, res) => {
   const pagination = getPagination(req.query.limit, req.query.page);
 
   const suppliers = await Supplier.findAndCountAll({
-    attributes: { exclude: ['personId'] },
     include: { model: Person, as: 'details', where },
     ...pagination,
   });
@@ -29,6 +28,7 @@ router.post('', async (req, res) => {
 
 router.patch('/:id', async (req, res) => {
   const supplier = await Supplier.update(req.body, { where: { id: req.params.id } });
+  console.log(supplier, req.body, req.params.id, '111111');
   if (!supplier[0]) return res.status(404).send();
   res.send(supplier);
 });

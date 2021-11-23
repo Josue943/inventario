@@ -1,5 +1,4 @@
 const Category = require('./models/category');
-const Client = require('./models/client');
 const Person = require('./models/person');
 const Product = require('./models/product');
 const Sale = require('./models/sale');
@@ -23,8 +22,7 @@ const products = [
   {
     barCode: '6938104006571',
     name: 'Bacteria Dophin 200ml',
-    costPrice: 0,
-    salePrice: 5860,
+    price: 5860,
     wholesalePrice: 0,
     stock: 0,
     minStock: 1,
@@ -34,9 +32,7 @@ const products = [
   {
     barCode: '6938104006595',
     name: '15 / P S B Dophin 200ml',
-    costPrice: 0,
-    salePrice: 5250,
-    wholesalePrice: 0,
+    price: 5250,
     stock: 4,
     minStock: 2,
     maxStock: 6,
@@ -46,8 +42,7 @@ const products = [
   {
     barCode: '6938104010370',
     name: 'Bomba De Aire RC-003',
-    costPrice: 0,
-    salePrice: 12950,
+    price: 12950,
     wholesalePrice: 0,
     stock: 7,
     minStock: 0,
@@ -92,33 +87,26 @@ const saleProducts = [
 
 const users = [
   {
-    documentId: '1111111111111',
-    documentType: 'ggg',
-    email: 'josue@hotmail.com',
-    managerName: 'mario',
-    names: 'josue',
-    surnames: 'cordero',
-    phone: '22222222',
-    genre: 'mas',
     username: 'josue',
-    email: 'josue@hotmail.com',
     password: '123456',
-    avatar: 'gg',
+    personId: 1,
+    admin: true,
   },
 ];
 
 const persons = [
   {
     documentId: '111111111f1111',
-    documentType: 'ggg',
+    documentType: 'otro',
     email: 'josue@hotmail.com',
     name: 'josue',
     surnames: 'cordero',
     phone: '22222222',
+    client: true,
   },
   {
     documentId: '22222222',
-    documentType: 'ggg',
+    documentType: 'cedula',
     email: 'carlos@hotmail.com',
     name: 'carlos',
     surnames: 'jimenez',
@@ -126,7 +114,7 @@ const persons = [
   },
   {
     documentId: '2233333',
-    documentType: 'ggg',
+    documentType: 'tin',
     email: 'jose@hotmail.com',
     name: 'jose',
     surnames: 'alvarez',
@@ -136,8 +124,6 @@ const persons = [
 
 const suppliers = [{ personId: 1 }];
 
-const clients = [{ personId: 2 }, { personId: 3 }];
-
 const categories = [{ name: 'filtración' }];
 
 (async () => {
@@ -145,12 +131,11 @@ const categories = [{ name: 'filtración' }];
     await sequelize.sync({ force: true });
     await Person.bulkCreate(persons);
     await Supplier.bulkCreate(suppliers);
-    await Client.bulkCreate(clients);
     await Category.bulkCreate(categories);
     await Product.bulkCreate(products);
     await Sale.bulkCreate(sales);
     await SaleProduct.bulkCreate(saleProducts);
-    /*   await User.bulkCreate(users); */
+    await User.bulkCreate(users);
   } catch (error) {
     console.error(error);
   }

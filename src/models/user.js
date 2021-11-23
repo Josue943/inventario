@@ -1,21 +1,14 @@
 const { DataTypes, Model } = require('sequelize');
 const bcrypt = require('bcryptjs');
 
+const Person = require('./person');
 const sequelize = require('../db');
 
 class User extends Model {}
 
 User.init(
   {
-    documentId: { type: DataTypes.STRING, allowNull: false, unique: true },
-    documentType: { type: DataTypes.STRING, defaultValue: 'otro' },
-    admin: { type: DataTypes.BOOLEAN, defaultValue: false },
-    names: { type: DataTypes.STRING, allowNull: false },
-    surnames: { type: DataTypes.STRING, allowNull: false },
-    phone: { type: DataTypes.STRING, allowNull: false },
-    genre: { type: DataTypes.STRING, allowNull: false },
     username: { type: DataTypes.STRING, allowNull: false, unique: true },
-    email: { type: DataTypes.STRING, allowNull: false, validate: { isEmail: true } },
     password: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -24,8 +17,7 @@ User.init(
         this.setDataValue('password', hash);
       },
     },
-    enable: { type: DataTypes.BOOLEAN, defaultValue: true },
-    avatar: { type: DataTypes.STRING, allowNull: false },
+    admin: { type: DataTypes.BOOLEAN, defaultValue: false },
   },
   {
     tableName: 'users',
@@ -33,5 +25,7 @@ User.init(
     timestamps: false,
   }
 );
+
+User.belongsTo(Person, { foreignKey: { name: 'personId', allowNull: true }, as: 'details' });
 
 module.exports = User;

@@ -1,10 +1,14 @@
 const router = require('express').Router();
 const { Op } = require('sequelize');
+const moment = require('moment');
 
-const sequelize = require('../db');
+const getPaginatedResponse = require('../utils/getPaginatedResponse');
+const getPagination = require('../utils/getPagination');
+const Person = require('../models/person');
 const Product = require('../models/product');
 const Sale = require('../models/sale');
 const SaleProduct = require('../models/saleProduct');
+const sequelize = require('../db');
 
 /*
 •	Ver lista de ventas pendientes.
@@ -14,20 +18,33 @@ const SaleProduct = require('../models/saleProduct');
 router.get('', async (req, res) => {
   const where = {};
 
-  //format 2021-10-02
-  if (req.query.startDate && req.query.endDate)
-    where.date = { [Op.between]: [new Date(req.query.startDate), new Date(req.query.endDate)] };
+  if (req.query.startDate && req.query.endDate) {
+    where.date = {
+      [Op.between]: [
+        moment(req.query.startDate).startOf('day').toDate(),
+        moment(req.query.endDate).endOf('day').toDate(),
+      ],
+    };
+  }
 
-  const sales = await Sale.findAll({
+  const pagination = getPagination(req.query.limit, req.query.page);
+
+  const sales = await Sale.findAndCountAll({
     where,
-    include: {
-      model: Product,
-      as: 'products',
-      attributes: ['id', 'name'],
-      through: { attributes: ['quantity', 'unitPrice'], as: 'saleDetails' }, // this will remove the rows from the join table (i.e. 'SaleProduct table') in the result set
-    },
+    attributes: { exclude: ['clientId'] },
+    include: [
+      {
+        model: Product,
+        as: 'products',
+        attributes: ['id', 'name'],
+        through: { attributes: ['quantity', 'unitPrice'], as: 'saleDetails' }, // this will remove the rows from the join table (i.e. 'SaleProduct table') in the result set
+      },
+      { model: Person, as: 'client', attributes: ['id', 'name', 'surnames'] },
+    ],
+    ...pagination,
   });
-  res.send(sales);
+
+  res.send(getPaginatedResponse(sales, req.query.limit));
 });
 
 router.post('', async (req, res) => {
@@ -40,13 +57,11 @@ router.post('', async (req, res) => {
       products.map(product => ({ ...product, saleId: sale.id })),
       { transaction }
     );
-
-    const promises = savedProducts.map(({ productId, quantity }) =>
+    /*    const promises = savedProducts.map(({ productId, quantity }) =>
       Product.update({ sold: sequelize.literal(`sold + ${quantity}`) }, { where: { id: productId }, transaction })
     );
-
     const productsUpdated = await Promise.all(promises);
-    if (productsUpdated.some(item => !item[0])) throw 'Server Error ';
+    if (productsUpdated.some(item => !item[0])) throw 'Server Error '; */
 
     return { sale, products: savedProducts };
   });
