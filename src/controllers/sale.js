@@ -47,6 +47,24 @@ router.get('', async (req, res) => {
   res.send(getPaginatedResponse(sales, req.query.limit));
 });
 
+router.get('/:id', async (req, res) => {
+  const sale = await Sale.findOne({
+    where: { id: req.params.id },
+    attributes: { exclude: ['clientId'] },
+    include: [
+      {
+        model: Product,
+        as: 'products',
+        attributes: ['id', 'name'],
+        through: { attributes: ['quantity', 'unitPrice'], as: 'saleDetails' }, // this will remove the rows from the join table (i.e. 'SaleProduct table') in the result set
+      },
+      { model: Person, as: 'client', attributes: ['id', 'name', 'surnames'] },
+    ],
+  });
+
+  res.send(sale);
+});
+
 router.post('', async (req, res) => {
   const { products, ...rest } = req.body;
 

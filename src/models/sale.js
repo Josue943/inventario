@@ -19,6 +19,15 @@ Sale.init(
       type: DataTypes.FLOAT,
       allowNull: false,
     },
+    totalPaid: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    changeReturned: {
+      type: DataTypes.FLOAT,
+      defaultValue: 0,
+    },
     date: {
       type: DataTypes.DATE,
       defaultValue: NOW,
@@ -27,6 +36,6 @@ Sale.init(
   { tableName: 'sales', sequelize, timestamps: false }
 );
 
-Sale.belongsTo(Person, { as: 'client', foreignKey: { name: 'clientId', allowNull: false } });
+Sale.belongsTo(Person, { as: 'client', foreignKey: { name: 'clientId', allowNull: true } });
 
 module.exports = Sale;

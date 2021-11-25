@@ -12,6 +12,8 @@ router.get('', async (req, res) => {
 
   if (req.query.search) where[Op.or] = setSearch(['name'], req.query.search);
 
+  if (req.query.enabled) where.enabled = true;
+
   const pagination = getPagination(req.query.limit, req.query.page);
 
   const categories = await Category.findAndCountAll({ where, ...pagination });

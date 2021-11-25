@@ -5,6 +5,7 @@ const getPagination = require('../utils/getPagination');
 const getPaginatedResponse = require('../utils/getPaginatedResponse');
 const Product = require('../models/product');
 const setSearch = require('../utils/setSearch');
+const upload = require('../middlewares/upload');
 
 router.get('', async (req, res) => {
   const helper = { order: [['id', 'ASC']], where: {} };
@@ -19,10 +20,19 @@ router.get('', async (req, res) => {
 
   if (req.query.sortBy) helper.order.unshift([req.query.sortBy, req.query.order || 'ASC']);
 
+  if (req.query.enabled) helper.where.enabled = true;
+
   const pagination = getPagination(req.query.limit, req.query.page);
 
   const products = await Product.findAndCountAll({ ...helper, ...pagination });
   res.send(getPaginatedResponse(products, req.query.limit));
+});
+
+router.put('/:id/image', upload.single('image'), async (req, res) => {
+  const url = req.protocol + '://' + req.get('host');
+  const image = url + '/images/' + req.file.filename;
+  await Product.update({ image }, { where: { id: req.params.id } });
+  res.send();
 });
 
 router.post('', async (req, res) => {

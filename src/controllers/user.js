@@ -44,4 +44,10 @@ router.delete('/:id', async (req, res) => {
   res.send();
 });
 
+router.post('/login', async (req, res) => {
+  const user = await User.findOne({ where: { username: req.body.username } });
+  console.log(user.password === req.body.password);
+  res.send(user);
+});
+
 module.exports = router;

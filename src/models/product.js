@@ -50,6 +50,10 @@ Product.init(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    image: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     enabled: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
