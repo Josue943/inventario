@@ -1,3 +1,5 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const router = require('express').Router();
 const { Op } = require('sequelize');
 
@@ -46,8 +48,17 @@ router.delete('/:id', async (req, res) => {
 
 router.post('/login', async (req, res) => {
   const user = await User.findOne({ where: { username: req.body.username } });
-  console.log(user.password === req.body.password);
-  res.send(user);
+  const isMatch = bcrypt.compareSync(req.body.password, user.password);
+  if (!isMatch) return res.status(404).send();
+  const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY, { expiresIn: '3h' });
+  res.send({ user, token });
+});
+
+router.post('/login/auto', async (req, res) => {
+  const { userId } = jwt.verify(req.body.token, process.env.SECRET_KEY);
+  const user = await User.findByPk(userId);
+  const token = jwt.sign({ userId }, process.env.SECRET_KEY, { expiresIn: '3h' });
+  res.send({ user, token });
 });
 
 module.exports = router;
