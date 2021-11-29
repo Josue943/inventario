@@ -57,7 +57,7 @@ router.post('/login', async (req, res) => {
 router.post('/login/auto', async (req, res) => {
   const { userId } = jwt.verify(req.body.token, process.env.SECRET_KEY);
   const user = await User.findByPk(userId);
-  const token = jwt.sign({ userId }, process.env.SECRET_KEY, { expiresIn: '3h' });
+  const token = jwt.sign({ userId }, process.env.SECRET_KEY /* , { expiresIn: '3h' } */);
   res.send({ user, token });
 });
 

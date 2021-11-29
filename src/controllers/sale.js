@@ -12,9 +12,9 @@ const sequelize = require('../db');
 
 /*
 •	Ver lista de ventas pendientes.
-
+* devuelve mas el count
 */
-//dd/mm/year
+
 router.get('', async (req, res) => {
   const where = {};
 
@@ -41,6 +41,7 @@ router.get('', async (req, res) => {
       },
       { model: Person, as: 'client', attributes: ['id', 'name', 'surnames'] },
     ],
+    distinct: true,
     ...pagination,
   });
 

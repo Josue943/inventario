@@ -14,6 +14,7 @@ app.use('/api/products', require('./controllers/product'));
 app.use('/api/suppliers', require('./controllers/supplier'));
 app.use('/api/sales', require('./controllers/sale'));
 app.use('/api/users', require('./controllers/user'));
+app.use('/api/returns', require('./controllers/return'));
 app.use(errorHandler);
 
 module.exports = app;

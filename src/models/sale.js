@@ -12,12 +12,8 @@ Sale.init(
       allowNull: false,
     },
     discount: {
-      type: DataTypes.STRING,
-      defaultValue: 0,
-    },
-    total: {
       type: DataTypes.FLOAT,
-      allowNull: false,
+      defaultValue: 0,
     },
     totalPaid: {
       type: DataTypes.FLOAT,

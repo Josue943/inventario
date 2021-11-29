@@ -5,6 +5,7 @@ const Sale = require('./models/sale');
 const SaleProduct = require('./models/saleProduct');
 const Supplier = require('./models/supplier');
 const User = require('./models/user');
+const Return = require('./models/return');
 
 const sequelize = require('./db');
 
